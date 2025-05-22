@@ -8,7 +8,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Embedding, LSTM, Dense, Dropout, Bidirectional, BatchNormalization
 
 
-df = pd.read_csv('./Data/train.csv', header=None, names=['label','title','review'])
+df = pd.read_csv('../Data/train.csv', header=None, names=['label','title','review'])
 
 texts = df['review'].values
 labels = df['label'].values
@@ -19,36 +19,22 @@ num_classes = len(np.unique(labels))
 
 labels_one_hot = to_categorical(labels, num_classes=num_classes)
  
-tokenizer = Tokenizer(num_words=1000, oov_token="<DOV>")
+tokenizer = Tokenizer(num_words=50000, oov_token="<DOV>")
 
 tokenizer.fit_on_texts(texts)
 
 sequences = tokenizer.texts_to_sequences(texts)
 
-padded = pad_sequences(sequences, maxlen=100)
+padded = pad_sequences(sequences, maxlen=150)
 
 X_train, X_val, Y_train, Y_val = train_test_split(padded, labels_one_hot, test_size=0.2, random_state=42)
 
 model = Sequential([
-    Embedding(input_dim=1000, output_dim=32),
+    Embedding(input_dim=50000, output_dim=32),
     LSTM(64, return_sequences=False),
-    Dense(32, activation='relu'),
+    Dense(64, activation='relu'),
     Dense(2, activation='softmax')
 ])
-
-# "BEST" ACCURACY MODEL ARCHITECTURE FOR LATER, IT USES A LOT OF THINGS THAT I DONT REALLY UNDERSTAND YET SO LETS PUT THAT AWAY FOR NOW
-# model = Sequential([
-#     Embedding(input_dim=50000, output_dim=300, input_length=max_len),
-#     Bidirectional(LSTM(256, return_sequences=True)),
-#     Dropout(0.5),
-#     Bidirectional(LSTM(128)),
-#     Dropout(0.5),
-#     Dense(128, activation='relu'),
-#     BatchNormalization(),
-#     Dropout(0.5),
-#     Dense(64, activation='relu'),
-#     Dense(2, activation='softmax')
-# ])
 
 model.build(input_shape=(None, padded.shape[1]))
 
@@ -58,4 +44,19 @@ model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accur
 
 model.fit(X_train, Y_train, epochs=5, validation_data=(X_val, Y_val))
 
-model.save("./Trained_models/sentiment_please_dont_brick_my_pc_model.keras")
+model.save("../Trained_models/sentiment_model.keras")
+
+def predict_review(text):
+    seq = tokenizer.texts_to_sequences([text])
+    padded_seq = pad_sequences(seq, maxlen=padded.shape[1], padding='post')
+    pred = model.predict(padded_seq)
+    class_idx = np.argmax(pred)
+    return class_idx + 1
+
+
+print(predict_review("ive got a lamp in the corner of my room behind my desk thats a complete pain in the arse to turn on and off. ive been using this with the lamp for a month now and it works perfectly. added a little velcro and now i have a light switch where ever i want. under my desk, shelf, etc."))
+print(predict_review("Very disappointed in this product. It worked perfectly for exactly three days and could not be resuscitated. It was very inexpensive so I did not want to pay half again the price to ship it back for an exchange, so the company would do nothing when they sent me an inquiry as to product satisfaction."))
+print(predict_review("This is the all time best book. She mentoins in the book how anyone can be a vampire, who knows. Well anyway I like the idea of having one soulmate and one crazed werewolf crush. P.S I think that it is a good twist on the story about how anone can be part of the night world."))
+print(predict_review("Can't believe I have never reviewed this book before. First read this back when I was 13. Like a lot of girls wanting the mysterious boyfriend and believed in soul-mates which drug me into these books. Rereading it over time years later still stands the test of time for me. Ash is that bad boy you want and your parents want you to stay away from even though he seems like a jerk there is just something about him that make you wanna root for him."))
+
+print("Correct review : 2 1 2 2")
