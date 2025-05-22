@@ -1,0 +1,8 @@
+- We need to write a script to test the model
+- We need to tweek the values for training (I'm thinking of going accuracy>performance, but we can discuss it later)
+    - got it up from 91 accuracy to 92 by just tweeking the values, so maybe we can push it even further
+    - The current model I've trained has 0.9222 accuracy, 0.1951 loss, 0.9192 val_accuracy and 0.2018 val_loss
+- We need to rewrite the way we use data
+    - get rid of the test_size=0.2
+    - use the test.csv file for training instead
+- We can also add a script for retraining the model, maybe somewhere in the future we will find more data and want to add to the model we already trained
