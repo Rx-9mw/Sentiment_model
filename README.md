@@ -15,11 +15,11 @@ pip install tensorflow keras numpy pandas scikit-learn
 ```
 6. Create a new folder and open it with a code editor
 7. Initialize git and copy the repo into it (I'm not including the test and train csv's because of their size)
-8. Put the test.csv and train.csv files into the main folder with the sentiment_file.py
-9. Navigate to the folder in the Anaconda Prompt
-10. Run sentiment_file.py within the Anaconda Prompt:
+8. Put the test.csv and train.csv files into the Data folder
+9. Navigate to the folder in the Anaconda Prompt, then into the Training_script folder
+10. Run sentiment_model_trainer.py within the Anaconda Prompt:
 ```sh
-python sentiment_file.py
+python sentiment_model_trainer.py
 ```
 <h1><div align="center">
 This README file is under construction...

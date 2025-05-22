@@ -8,7 +8,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Embedding, LSTM, Dense, Dropout, Bidirectional, BatchNormalization
 
 
-df = pd.read_csv('train.csv', header=None, names=['label','title','review'])
+df = pd.read_csv('./Data/train.csv', header=None, names=['label','title','review'])
 
 texts = df['review'].values
 labels = df['label'].values
@@ -58,4 +58,4 @@ model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accur
 
 model.fit(X_train, Y_train, epochs=5, validation_data=(X_val, Y_val))
 
-model.save("sentiment_please_dont_brick_my_pc_model.keras")
+model.save("./Trained_models/sentiment_please_dont_brick_my_pc_model.keras")

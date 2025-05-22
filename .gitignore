@@ -1,3 +1,2 @@
-trained_models
-train.csv
-test.csv
+Trained_models/*
+Data/*
