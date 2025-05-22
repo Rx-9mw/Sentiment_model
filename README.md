@@ -21,5 +21,9 @@ pip install tensorflow keras numpy pandas scikit-learn
 ```sh
 python sentiment_file.py
 ```
-
-# This README file is under construction... 🚧🏗️👷🚧👷🚧
+<h1><div align="center">
+This README file is under construction...
+</div></h1>
+<h1><div align="center">
+🚧🏗️👷🚧👷🚧
+</div></h1>
