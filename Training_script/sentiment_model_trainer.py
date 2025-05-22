@@ -8,7 +8,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Embedding, LSTM, Dense, Dropout, Bidirectional, BatchNormalization
 
 
-df = pd.read_csv('../converted_reviews.csv', header=None, names=['label','title','review'], nrows=50000)
+df = pd.read_csv('../Data/converted_reviews.csv', header=None, names=['label','title','review'], nrows=50000)
 
 texts = df['review'].values
 labels = df['label'].values

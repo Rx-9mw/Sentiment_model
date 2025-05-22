@@ -31,4 +31,4 @@ def convert_label_format(input_file, output_file):
     print(f"✅ Converted lines written to: {output_file}")
 
 # Example usage
-convert_label_format("./Data/train.ft.txt", "converted_reviews.csv")
+convert_label_format("./Data/train.ft.txt", "./Data/converted_reviews.csv")
