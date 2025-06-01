@@ -5,17 +5,17 @@ from keras.layers import Bidirectional
 from tensorflow.keras import regularizers
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
-from sklearn.model_selection import train_test_split
+# from sklearn.model_selection import train_test_split
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Embedding, LSTM, Dense, Dropout
 from tensorflow.keras.callbacks import EarlyStopping
 
-words = 150000
+words = 25000
 max_length = 150
 epochs = 5
 
-df = pd.read_csv('../Data/train.csv', header=None, names=['label','title','review'])
+df = pd.read_csv('../Data/train.csv', header=None, names=['label','title','review'], nrows=words)
 
 texts = df['review'].values
 labels = df['label'].values
@@ -58,8 +58,9 @@ early_stopping = EarlyStopping(
     restore_best_weights=True
 )
 
+#hiper-zmienne
 model = Sequential([
-    Embedding(input_dim=50000, output_dim=16),
+    Embedding(input_dim=words, output_dim=16),
     Bidirectional(LSTM(64, return_sequences=False)),
     Dropout(0.3),
     Dense(16, activation='relu', kernel_regularizer=regularizers.l2(0.001)),
@@ -71,7 +72,8 @@ model.build(input_shape=(None, padded.shape[1]))
 
 model.summary()
 
-model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+#opt adam adadelta adagrad rmsprop
+model.compile(loss='categorical_crossentropy', optimizer='adagrad', metrics=['accuracy'])
 
 model.fit(X_train, Y_train, epochs=epochs, validation_data=(X_val, Y_val), batch_size=64, callbacks=[early_stopping])
 
