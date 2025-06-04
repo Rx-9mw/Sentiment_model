@@ -27,7 +27,7 @@ def remove_stopwords(text):
 
 words = 100000
 max_length = 150
-epochs = 20
+epochs = 50
 
 
 df = pd.read_csv('../Data/train.csv', header=None, names=['label','title','review'], nrows=1000000)
@@ -69,11 +69,11 @@ test_sequences = tokenizer.texts_to_sequences(test_texts)
 X_val = pad_sequences(test_sequences, maxlen=max_length)
 Y_val = test_labels_one_hot
 
-# early_stopping = EarlyStopping(
-#     monitor='val_loss',
-#     patience=5,
-#     restore_best_weights=True
-# )
+early_stopping = EarlyStopping(
+    monitor='val_loss',
+    patience=6,
+    restore_best_weights=True
+)
 
 #hiper-zmienne
 model = Sequential([
@@ -92,8 +92,8 @@ model.summary()
 #opt adam adadelta adagrad rmsprop
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
-history = model.fit(X_train, Y_train, epochs=epochs, validation_data=(X_val, Y_val), batch_size=32 ) 
-'''callbacks=[early_stopping]'''
+history = model.fit(X_train, Y_train, epochs=epochs, validation_data=(X_val, Y_val), batch_size=32, callbacks=[early_stopping] ) 
+
 
 model.save("../Trained_models/Models/sentiment_model_dropout_twice.keras")
 
