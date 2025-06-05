@@ -5,7 +5,7 @@ from keras.layers import Bidirectional
 from tensorflow.keras import regularizers
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
-# from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Embedding, LSTM, Dense, Dropout
@@ -16,6 +16,8 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from nltk.corpus import stopwords
 from keras.layers import BatchNormalization
+from keras.optimizers import Adam
+from tensorflow.keras.callbacks import ReduceLROnPlateau
 
 #nltk.download('stopwords')
 stop_words = set(stopwords.words('english'))
@@ -54,20 +56,20 @@ sequences = tokenizer.texts_to_sequences(texts)
 
 padded = pad_sequences(sequences, maxlen=max_length)
 
-# X_train, X_val, Y_train, Y_val = train_test_split(padded, labels_one_hot, test_size=0.2, random_state=42)
+X_train, X_val, Y_train, Y_val = train_test_split(padded, labels_one_hot, test_size=0.1, random_state=42)
 
-X_train = padded
-Y_train = labels_one_hot
+# X_train = padded
+# Y_train = labels_one_hot
 
-test_df = pd.read_csv("../Data/test.csv", header=None, names=["label", "title", "review"], nrows=100000)
-test_texts = test_df["review"].values
-test_labels = test_df["label"].values
-test_labels = test_labels - 1
-test_labels_one_hot = to_categorical(test_labels, num_classes=num_classes)
+# test_df = pd.read_csv("../Data/test.csv", header=None, names=["label", "title", "review"], nrows=100000)
+# test_texts = test_df["review"].values
+# test_labels = test_df["label"].values
+# test_labels = test_labels - 1
+# test_labels_one_hot = to_categorical(test_labels, num_classes=num_classes)
 
-test_sequences = tokenizer.texts_to_sequences(test_texts)
-X_val = pad_sequences(test_sequences, maxlen=max_length)
-Y_val = test_labels_one_hot
+# test_sequences = tokenizer.texts_to_sequences(test_texts)
+# X_val = pad_sequences(test_sequences, maxlen=max_length)
+# Y_val = test_labels_one_hot
 
 early_stopping = EarlyStopping(
     monitor='val_loss',
@@ -77,10 +79,11 @@ early_stopping = EarlyStopping(
 
 #hiper-zmienne
 model = Sequential([
-    Embedding(input_dim=words, output_dim=32),
+    Embedding(input_dim=words, output_dim=32, embeddings_regularizer=regularizers.l2(1e-6)),
     Dropout(0.5),
-    Bidirectional(LSTM(32, return_sequences=False)),
-    Dense(16, activation='relu', kernel_regularizer=regularizers.l2(0.01)),
+    Bidirectional(LSTM(16, return_sequences=False)),
+    Dropout(0.5),
+    Dense(8, activation='relu', kernel_regularizer=regularizers.l2(0.01)),
     BatchNormalization(),
     Dense(2, activation='softmax')
 ])
@@ -89,10 +92,14 @@ model.build(input_shape=(None, padded.shape[1]))
 
 model.summary()
 
-#opt adam adadelta adagrad rmsprop
-model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+opt = Adam(learning_rate=0.0005)
 
-history = model.fit(X_train, Y_train, epochs=epochs, validation_data=(X_val, Y_val), batch_size=32, callbacks=[early_stopping] ) 
+reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=3)
+
+#opt adam adadelta adagrad rmsprop
+model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
+
+history = model.fit(X_train, Y_train, epochs=epochs, validation_data=(X_val, Y_val), batch_size=32, callbacks=[early_stopping, reduce_lr] ) 
 
 
 model.save("../Trained_models/Models/sentiment_model_dropout_twice.keras")
