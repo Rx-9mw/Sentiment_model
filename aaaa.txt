@@ -1,0 +1,9 @@
+words for dictionaries 
+max length of review
+number of epochs
+
+LSTM neurons
+
+Dense layer
+
+regularizers

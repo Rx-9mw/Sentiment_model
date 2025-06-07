@@ -28,75 +28,81 @@ def remove_stopwords(text):
     filtered = [w for w in tokens if w.lower() not in stop_words]
     return " ".join(filtered)
 
-words = 1000
-max_length = 150
-epochs = 2
-
-
-df = pd.read_csv('../Data/train.csv', header=None, names=['label','title','review'], nrows=1000)
-
-df['review_clean'] = df['review'].astype(str).apply(remove_stopwords)
-
-texts = df['review_clean'].values
-labels = df['label'].values
-
-labels = labels - 1
-
-num_classes = len(np.unique(labels))
-
-labels_one_hot = to_categorical(labels, num_classes=num_classes)
-
-tokenizer = Tokenizer(num_words=words, oov_token="<DOV>")
-
-tokenizer.fit_on_texts(texts)
-
-with open('../Trained_models/Dictionaries/tokenizer.pkl', 'wb') as f:
-    pickle.dump(tokenizer, f)
-
-sequences = tokenizer.texts_to_sequences(texts)
-
-padded = pad_sequences(sequences, maxlen=max_length)
-
-# X_train, X_val, Y_train, Y_val = train_test_split(padded, labels_one_hot, test_size=0.2, random_state=42)
-
-X_train = padded
-Y_train = labels_one_hot
-
-test_df = pd.read_csv("../Data/test.csv", header=None, names=["label", "title", "review"], nrows=10000)
-test_texts = test_df["review"].values
-test_labels = test_df["label"].values
-test_labels = test_labels - 1
-test_labels_one_hot = to_categorical(test_labels, num_classes=num_classes)
-
-test_sequences = tokenizer.texts_to_sequences(test_texts)
-X_val = pad_sequences(test_sequences, maxlen=max_length)
-Y_val = test_labels_one_hot
-
-# early_stopping = EarlyStopping(
-#     monitor='val_loss',
-#     patience=5,
-#     restore_best_weights=True
-# )
-
-#hiper-zmienne
-model = Sequential([
-    Embedding(input_dim=words, output_dim=32),
-    Dropout(0.5),
-    Bidirectional(LSTM(32, return_sequences=False)),
-    Dense(16, activation='relu', kernel_regularizer=regularizers.l2(0.01)),
-    BatchNormalization(),
-    Dense(2, activation='softmax')
-])
-
-model.build(input_shape=(None, padded.shape[1]))
-
-model.summary()
-
-#opt adam adadelta adagrad rmsprop
-model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-
+words = None
+max_length = None
+epochs = None
 canvas1 = None
 canvas2 = None
+model = None
+X_train = None
+Y_train = None
+X_val = None
+Y_val = None
+
+def get_ready():
+    global model, X_train, Y_train, X_val, Y_val
+    df = pd.read_csv('../Data/train.csv', header=None, names=['label','title','review'], nrows=1000)
+
+    df['review_clean'] = df['review'].astype(str).apply(remove_stopwords)
+
+    texts = df['review_clean'].values
+    labels = df['label'].values
+
+    labels = labels - 1
+
+    num_classes = len(np.unique(labels))
+
+    labels_one_hot = to_categorical(labels, num_classes=num_classes)
+
+    tokenizer = Tokenizer(num_words=words, oov_token="<DOV>")
+
+    tokenizer.fit_on_texts(texts)
+
+    with open('../Trained_models/Dictionaries/tokenizer.pkl', 'wb') as f:
+        pickle.dump(tokenizer, f)
+
+    sequences = tokenizer.texts_to_sequences(texts)
+
+    padded = pad_sequences(sequences, maxlen=max_length)
+
+    # X_train, X_val, Y_train, Y_val = train_test_split(padded, labels_one_hot, test_size=0.2, random_state=42)
+
+    X_train = padded
+    Y_train = labels_one_hot
+
+    test_df = pd.read_csv("../Data/test.csv", header=None, names=["label", "title", "review"], nrows=10000)
+    test_texts = test_df["review"].values
+    test_labels = test_df["label"].values
+    test_labels = test_labels - 1
+    test_labels_one_hot = to_categorical(test_labels, num_classes=num_classes)
+
+    test_sequences = tokenizer.texts_to_sequences(test_texts)
+    X_val = pad_sequences(test_sequences, maxlen=max_length)
+    Y_val = test_labels_one_hot
+
+    # early_stopping = EarlyStopping(
+    #     monitor='val_loss',
+    #     patience=5,
+    #     restore_best_weights=True
+    # )
+
+    #hiper-zmienne
+    model = Sequential([
+        Embedding(input_dim=words, output_dim=32),
+        Dropout(0.5),
+        Bidirectional(LSTM(32, return_sequences=False)),
+        Dense(16, activation='relu', kernel_regularizer=regularizers.l2(0.01)),
+        BatchNormalization(),
+        Dense(2, activation='softmax')
+    ])
+
+    model.build(input_shape=(None, padded.shape[1]))
+
+    model.summary()
+
+    #opt adam adadelta adagrad rmsprop
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+
 
 def create_plot_window():
     global canvas1, canvas2
@@ -214,13 +220,22 @@ class EpochLogger(Callback):
         self.root.after(0, lambda: self.label_loss_difference.config(text=f"Difference: {difference}", fg=color))
         self.root.after(0, lambda: self.label_val_loss.config(text=f"Current Validation Loss: {val_loss:.4f}"))
         self.root.after(0, lambda: self.label_val_acc.config(text=f"Current Validation Accuracy: {val_accuracy:.4f}"))
-        
+      
+def assign_variables():
+    global words, max_length, epochs
+    epochs = int(input_epoch.get())
+    max_length = int(input_review_length.get())
+    words = int(input_dictionary.get())
         
 def start_training():
     global training_thread
     graph_btn.config(state="disabled")
     start_btn.config(state="disabled")
+    
+    assign_variables()
+    get_ready()
     reset_labels()
+    
     def train():
         global history
         history = model.fit(
@@ -265,40 +280,50 @@ tk.Label(metrics, text="Training Metrics", font=title_font).grid(row=0, column=1
 tk.Label(metrics, text="Validation Metrics", font=title_font).grid(row=0, column=2, padx=30, sticky="w")
 
 # variables column
-label_epoch = tk.Label(metrics, text="Epoch: -", fg="black")
+
+label_epoch = tk.Label(metrics, text="Number of epochs", fg="black")
 label_epoch.grid(row=1, column=0, sticky="w", padx=30, pady=5)
 
-label_loss = tk.Label(metrics, text="Loss Before: - vs After: ", fg="black")
-label_loss.grid(row=2, column=0, sticky="w", padx=30, pady=5)
+input_epoch = tk.Entry(metrics, fg="black")
+input_epoch.grid(row=2, column=0, sticky="w", padx=30, pady=5)
+input_epoch.insert(0, "2")
 
-label_loss_difference = tk.Label(metrics, text="Difference: -", fg="black")
-label_loss_difference.grid(row=3, column=0, sticky="w", padx=30, pady=5)
+label_review_length = tk.Label(metrics, text="Max length of reviews", fg="black")
+label_review_length.grid(row=3, column=0, sticky="w", padx=30, pady=5)
+
+input_review_length = tk.Entry(metrics, fg="black")
+input_review_length.grid(row=4, column=0, sticky="w", padx=30, pady=5)
+input_review_length.insert(0, "150")
+
+label_dictionary = tk.Label(metrics, text="Dictionary size", fg="black")
+label_dictionary.grid(row=5, column=0, sticky="w", padx=30, pady=5)
+
+input_dictionary = tk.Entry(metrics, fg="black")
+input_dictionary.grid(row=6, column=0, sticky="w", padx=30, pady=5)
+input_dictionary.insert(0, "1000")
 
 start_btn = tk.Button(metrics, text="Start Training", bg="lightblue", command=start_training)
-start_btn.grid(row=4, column=0, sticky="w", padx=30, pady=5)
+start_btn.grid(row=7, column=0, sticky="w", padx=30, pady=5)
 
 # differences column
 label_epoch = tk.Label(metrics, text="Epoch: -", fg="black")
-label_epoch.grid(row=1, column=1, sticky="w", padx=30, pady=5)
+label_epoch.grid(row=2, column=1, sticky="w", padx=30, pady=5)
 
 label_loss = tk.Label(metrics, text="Loss Before: - vs After: ", fg="black")
-label_loss.grid(row=2, column=1, sticky="w", padx=30, pady=5)
+label_loss.grid(row=4, column=1, sticky="w", padx=30, pady=5)
 
 label_loss_difference = tk.Label(metrics, text="Difference: -", fg="black")
-label_loss_difference.grid(row=3, column=1, sticky="w", padx=30, pady=5)
-
-start_btn = tk.Button(metrics, text="Start Training", bg="lightblue", command=start_training)
-start_btn.grid(row=4, column=1, sticky="w", padx=30, pady=5)
+label_loss_difference.grid(row=6, column=1, sticky="w", padx=30, pady=5)
 
 # validation column
 label_val_loss = tk.Label(metrics, text="Current Validation Loss: -", fg="black")
-label_val_loss.grid(row=1, column=2, sticky="w", padx=30, pady=5)
+label_val_loss.grid(row=2, column=2, sticky="w", padx=30, pady=5)
 
 label_val_acc = tk.Label(metrics, text="Current Validation Accuracy: -", fg="black")
-label_val_acc.grid(row=2, column=2, sticky="w", padx=30, pady=5)
+label_val_acc.grid(row=4, column=2, sticky="w", padx=30, pady=5)
 
 graph_btn = tk.Button(metrics, text="Show graphs", bg="lightblue", command=create_plot_window)
-graph_btn.grid(row=4, column=2, sticky="w", padx=30, pady=5)
+graph_btn.grid(row=7, column=2, sticky="w", padx=30, pady=5)
 
 
 epoch_callback = EpochLogger( root, label_epoch, label_loss, label_val_loss, label_loss_difference, label_val_acc)
