@@ -18,6 +18,8 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from nltk.corpus import stopwords
 from keras.layers import BatchNormalization
+from tensorflow.keras.callbacks import Callback
+import threading
 
 
 # #nltk.download('stopwords')
@@ -164,15 +166,8 @@ def reset_labels():
     label_val_loss.config(text="Current Validation Loss: -", fg="black")
     label_val_acc.config(text="Current Validation Accuracy: -", fg="black")
 
-from tensorflow.keras.callbacks import Callback
-import threading
-
 root = tk.Tk()
 root.geometry("900x400")
-
-# Horizontal container for metrics
-# Horizontal container for metrics
-
 
 class EpochLogger(Callback):
     def __init__(self, root, label_epoch, label_loss, label_val_loss, label_loss_difference, label_val_acc):
