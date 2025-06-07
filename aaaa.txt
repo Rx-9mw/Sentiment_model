@@ -1,6 +1,6 @@
-words for dictionaries 
-max length of review
-number of epochs
+words for dictionaries 1
+max length of review 1
+number of epochs 1 
 
 LSTM neurons
 
