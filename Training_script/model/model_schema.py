@@ -9,7 +9,6 @@ from keras.layers import BatchNormalization
 def get_ready(words, max_length):
     nrows_val = 1000
     X_val, X_train, Y_val, Y_train = load_and_prepare_data(nrows_val, words, max_length)
-    print( load_and_prepare_data(nrows_val, words, max_length))
 
     #hiper-zmienne
     model = Sequential([
