@@ -12,11 +12,8 @@ def create_plot_window(history, root):
     val_loss = history.history['val_loss']
     train_acc = history.history['accuracy']
     val_acc = history.history['val_accuracy']
-    # win = tk.Toplevel(root)
-    # win.title("CNN Training Metrics")
     root.geometry("900x700")
 
-    # Wykres funkcji Loss czyli błędu uczenia
     if canvas1 is not None:
         canvas1.get_tk_widget().destroy()
         canvas1 = None
@@ -33,8 +30,6 @@ def create_plot_window(history, root):
     canvas1.get_tk_widget().pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
     canvas1.draw()
 
-    # Wykres Accuracy dokładnosci uczenia - w uproszczeniu  procent poprawnie sklasyfikowanych przykładów (zarówno pozytywnych, 
-    # jak i negatywnych)
     if canvas2 is not None:
         canvas2.get_tk_widget().destroy()
         canvas2 = None
