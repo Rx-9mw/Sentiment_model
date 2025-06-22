@@ -17,7 +17,11 @@ def remove_stopwords(text):
 
 def load_and_prepare_data(nrows_val, words, max_length):
     
-    df = pd.read_csv('../Data/train.csv' , header=None, names=['label','title','review'], nrows=nrows_val)
+    df = pd.read_csv('../Data/train.csv', 
+                     header=None, 
+                     names=['label','title','review'], 
+                     nrows=nrows_val)
+    
     df['review_clean'] = df['review'].astype(str).apply(remove_stopwords)
     texts = df['review_clean'].values
     labels = df['label'].values
@@ -37,7 +41,11 @@ def load_and_prepare_data(nrows_val, words, max_length):
     X_train = padded
     Y_train = labels_one_hot
 
-    test_df = pd.read_csv("../Data/test.csv", header=None, names=["label", "title", "review"], nrows=nrows_val)
+    test_df = pd.read_csv("../Data/test.csv", 
+                          header=None, 
+                          names=["label", "title", "review"], 
+                          nrows=nrows_val)
+    
     test_texts = test_df["review"].values
     test_labels = test_df["label"].values
     test_labels = test_labels - 1

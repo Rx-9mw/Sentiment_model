@@ -25,6 +25,8 @@ def get_ready(words, max_length):
     model.summary()
 
     #opt adam adadelta adagrad rmsprop
-    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+    model.compile(loss='categorical_crossentropy',
+                  optimizer='adam', 
+                  metrics=['accuracy'])
     
     return X_val, X_train, Y_val, Y_train, model

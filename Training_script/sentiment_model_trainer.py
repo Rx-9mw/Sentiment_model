@@ -86,9 +86,12 @@ metrics.pack(pady=20, padx=40)
 title_font = ("Helvetica", 12, "bold")
 
 # Header titles for each column (think big vertical HTML divs)
-tk.Label(metrics, text="Network Variables", font=title_font).grid(row=0, column=0, padx=30, sticky="w")
-tk.Label(metrics, text="Training Metrics", font=title_font).grid(row=0, column=1, padx=30, sticky="w")
-tk.Label(metrics, text="Validation Metrics", font=title_font).grid(row=0, column=2, padx=30, sticky="w")
+tk.Label(metrics, text="Network Variables", font=title_font).grid(
+    row=0, column=0, padx=30, sticky="w")
+tk.Label(metrics, text="Training Metrics", font=title_font).grid(
+    row=0, column=1, padx=30, sticky="w")
+tk.Label(metrics, text="Validation Metrics", font=title_font).grid(
+    row=0, column=2, padx=30, sticky="w")
 
 # variables column
 
@@ -113,7 +116,11 @@ input_dictionary = tk.Entry(metrics, fg="black")
 input_dictionary.grid(row=6, column=0, sticky="w", padx=30, pady=5)
 input_dictionary.insert(0, "100000")
 
-start_btn = tk.Button(metrics, text="Start Training", bg="lightblue", command=start_training)
+start_btn = tk.Button(metrics, 
+                      text="Start Training", 
+                      bg="lightblue", 
+                      command=start_training)
+
 start_btn.grid(row=7, column=0, sticky="w", padx=30, pady=5)
 
 # differences column
@@ -133,12 +140,21 @@ label_val_loss.grid(row=2, column=2, sticky="w", padx=30, pady=5)
 label_val_acc = tk.Label(metrics, text="Current Validation Accuracy: -", fg="black")
 label_val_acc.grid(row=4, column=2, sticky="w", padx=30, pady=5)
 
-graph_btn = tk.Button(metrics, text="Show graphs", bg="lightblue", command=lambda: create_plot_window(history, root))
+graph_btn = tk.Button(metrics,
+                      text="Show graphs", 
+                      bg="lightblue", 
+                      command=lambda: create_plot_window(history, root))
+
 graph_btn.grid(row=7, column=2, sticky="w", padx=30, pady=5)
 graph_btn.config(state="disabled")
 
 
-epoch_callback = EpochLogger( root, label_epoch, label_loss, label_val_loss, label_loss_difference, label_val_acc)
+epoch_callback = EpochLogger(root, 
+                             label_epoch, 
+                             label_loss, 
+                             label_val_loss, 
+                             label_loss_difference, 
+                             label_val_acc)
 
 
 root.mainloop()
