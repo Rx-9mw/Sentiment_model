@@ -50,3 +50,4 @@ def create_plot_window(history, root):
     canvas2 = FigureCanvasTkAgg(fig2, master=root)
     canvas2.get_tk_widget().pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
     canvas2.draw()
+    
