@@ -11,7 +11,7 @@ conda activate *NAME OF THE ENV*
 ```
 5. Install the packages for the script:
 ```sh
-pip install tensorflow keras numpy pandas scikit-learn
+pip install tensorflow keras numpy pandas scikit-learn nltk matplotlib contractions
 ```
 6. Create a new folder and open it with a code editor
 7. Initialize git and copy the repo into it (I'm not including the test and train csv's because of their size)
