@@ -50,7 +50,7 @@ class AttentionLayer(Layer):
 
 
 def get_ready(max_tokens, max_length):
-    nrows = 3200000
+    nrows = 3200
     X_train, y_train, X_val, y_val, vectorizer = load_and_prepare_data(
         nrows, max_tokens, max_length
     )
