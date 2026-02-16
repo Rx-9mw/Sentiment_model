@@ -1,15 +1,16 @@
 
-Rozmiar słownika = 150,000
-nrows = 200,000
-Maksymalna długość recenzji = 200
-Wymiar Embeddingu = 100
-LSTM Bi-directional = 64 unity
+Rozmiar słownika = 20,000
+nrows = 3,200,000
+Maksymalna długość recenzji = 150
+Wymiar Embeddingu = 32
+LSTM Bi-directional = 16 unity
 Dense = 32
 Funkcje aktywacji = ReLU, Softmax, Tanh
 Optymalizator = Adam
-Learning Rate startowy = 1e-6
-Batch size = 32
+Learning Rate startowy = 0.001
+Learning Rate minimalny = 0.00001
+Batch size = 256
 Liczba epok = 6
 Early stopping patience = 3
 Dropout = 0.5
-L2 regularizer = 0.01
+L2 regularizer = 0.001
