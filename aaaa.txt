@@ -1,9 +1,15 @@
-words for dictionaries 1
-max length of review 1
-number of epochs 1 
 
-LSTM neurons
-
-Dense layer
-
-regularizers
+Rozmiar słownika = 150,000
+nrows = 200,000
+Maksymalna długość recenzji = 200
+Wymiar Embeddingu = 100
+LSTM Bi-directional = 64 unity
+Dense = 32
+Funkcje aktywacji = ReLU, Softmax, Tanh
+Optymalizator = Adam
+Learning Rate startowy = 1e-6
+Batch size = 32
+Liczba epok = 6
+Early stopping patience = 3
+Dropout = 0.5
+L2 regularizer = 0.01

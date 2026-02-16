@@ -19,20 +19,18 @@ class EpochLogger(Callback):
         self.loss_before = None
         self.epoch_count = 0
     
-    
     def on_epoch_begin(self, epoch, logs=None):
         self.epoch_count = epoch + 1
         self.root.after(0, lambda: self.label_epoch.config(
             text=f"Working on Epoch {epoch + 1}..."))
         
-        
     def on_train_end(self, logs=None):
         self.root.after(0, lambda: self.label_epoch.config(
             text=f"Finished all {self.epoch_count} Epochs."))
         
-        
     def on_epoch_end(self, epoch, logs=None):
         current_loss = logs.get("val_loss")
+        
         def progress():
             if epoch > 0:
                 if self.loss is not None: 

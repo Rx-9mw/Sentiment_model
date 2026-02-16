@@ -1,32 +1,88 @@
-
-from keras.layers import Bidirectional
-from tensorflow.keras import regularizers
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Embedding, LSTM, Dense, Dropout
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import (
+    Embedding, LSTM, Dense, Dropout,
+    Bidirectional,
+    GlobalAveragePooling1D, Input
+)
+from tensorflow.keras.regularizers import l2
+from tensorflow.keras.metrics import Precision, Recall
 from data.data_processing import load_and_prepare_data
-from keras.layers import BatchNormalization
+from tensorflow.keras.layers import Layer
+from tensorflow.keras.utils import register_keras_serializable
+import tensorflow as tf
 
-def get_ready(words, max_length):
-    nrows_val = 1000
-    X_val, X_train, Y_val, Y_train = load_and_prepare_data(nrows_val, words, max_length)
+@register_keras_serializable()
+class AttentionLayer(Layer):
+    def __init__(self, trainable=True, dtype=tf.float32, **kwargs):
+        super(AttentionLayer, self).__init__(trainable=trainable, dtype=dtype, **kwargs)
+        self.supports_masking = True
 
-    #hiper-zmienne
-    model = Sequential([
-        Embedding(input_dim=words, output_dim=32),
-        Dropout(0.5),
-        Bidirectional(LSTM(32, return_sequences=False)),
-        Dense(16, activation='relu', kernel_regularizer=regularizers.l2(0.01)),
-        BatchNormalization(),
-        Dense(2, activation='softmax')
-    ])
+    def compute_mask(self, inputs, mask=None):
+        return None
 
-    model.build(input_shape=(None, X_train.shape[1]))
+    def build(self, input_shape):
+        self.W = self.add_weight(
+            name="att_weight",
+            shape=(input_shape[-1], input_shape[-1]),
+            initializer="glorot_uniform",
+            trainable=True
+        )
+        self.b = self.add_weight(
+            name="att_bias",
+            shape=(input_shape[-1],),
+            initializer="zeros",
+            trainable=True
+        )
+        self.u = self.add_weight(
+            name="att_u",
+            shape=(input_shape[-1], 1),
+            initializer="glorot_uniform",
+            trainable=True
+        )
+        super().build(input_shape)
+
+    def call(self, inputs, mask = None):
+        # inputs: (batch, time, features)
+        score = tf.tanh(tf.tensordot(inputs, self.W, axes=1) + self.b)
+        attention_weights = tf.nn.softmax(tf.tensordot(score, self.u, axes=1), axis=1)
+        context_vector = tf.reduce_sum(inputs * attention_weights, axis=1)
+        return context_vector
+
+
+def get_ready(max_tokens, max_length):
+    nrows = 3200000
+    X_train, y_train, X_val, y_val, vectorizer = load_and_prepare_data(
+        nrows, max_tokens, max_length
+    )
+
+    vocab_size = len(vectorizer.get_vocabulary())
+
+    inputs = Input(shape=(max_length,))
+
+    x = Embedding(
+        input_dim=vocab_size,
+        output_dim=32,
+        mask_zero=False
+    )(inputs)
+
+    x = Bidirectional(LSTM(16, return_sequences=True, recurrent_dropout=0.2))(x)
+    x = AttentionLayer()(x)
+    x = Dense(32, activation="relu", kernel_regularizer=l2(0.001))(x)
+    x = Dropout(0.5)(x)
+
+    outputs = Dense(2, activation="softmax")(x)
+    model = Model(inputs, outputs)
+
+    model.compile(
+        optimizer="adam",
+        loss="categorical_crossentropy",
+        metrics=[
+            "accuracy",
+            Precision(name="precision"),
+            Recall(name="recall")
+        ]
+    )
 
     model.summary()
 
-    #opt adam adadelta adagrad rmsprop
-    model.compile(loss='categorical_crossentropy',
-                  optimizer='adam', 
-                  metrics=['accuracy'])
-    
-    return X_val, X_train, Y_val, Y_train, model
+    return X_train, y_train, X_val, y_val, model, vectorizer
