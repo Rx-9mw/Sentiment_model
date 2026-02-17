@@ -19,6 +19,7 @@ def clean_review(text):
     text = re.sub(r"(.)\1{2,}", r"\1", text)
     text = re.sub(r"[^a-z\s]", " ", text)
     text = re.sub(r"\s+", " ", text).strip()
+
     return text
 
 def remove_stopwords(text):
@@ -52,7 +53,6 @@ def load_and_prepare_data(nrows, max_tokens, max_length):
     vectorizer.adapt(df["clean"].values)
     X_train = vectorizer(df["clean"].values)
 
-    # Validation
     test_df = pd.read_csv(
         "../Data/test.csv",
         header=None,
@@ -70,4 +70,5 @@ def load_and_prepare_data(nrows, max_tokens, max_length):
     X_val = vectorizer(test_df["clean"].values)
     y_val = to_categorical(test_df["label"].values - 1, num_classes)
 
-    return X_train, y_train, X_val, y_val, vectorizer
+   return X_train, y_train, X_val, y_val, vectorizer
+

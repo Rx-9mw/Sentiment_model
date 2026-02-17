@@ -25,33 +25,6 @@ vectorizer = None
 root = tk.Tk()
 root.geometry("900x400")
 
-def assign_variables():
-    global words, max_length, epochs, X_val, Y_val
-    epochs = int(input_epoch.get())
-    max_length = int(input_review_length.get())
-    words = int(input_dictionary.get())
-
-def reset_labels():
-    label_epoch.config(text="Epoch: -", fg="black")
-    label_loss.config(text="Loss Before: - vs After: -", fg="black")
-    label_loss_difference.config(text="Difference: -", fg="black")
-    label_val_loss.config(text="Current Validation Loss: -", fg="black")
-    label_val_acc.config(text="Current Validation Accuracy: -", fg="black")
-
-def training_completed():
-    model.save("../Trained_models/Models/sentiment_model_dropout_twice.keras")
-    vectorizer_model = tf.keras.Sequential([
-        vectorizer
-    ])
-
-    _ = vectorizer_model(tf.constant(["dummy text"]))
-
-    vectorizer_model.save("../Trained_models/Dictionaries/text_vectorizer.keras")
-    print("Vectorizer vocab size:", len(vectorizer.get_vocabulary()))
-
-    graph_btn.config(state="active")
-    start_btn.config(state="active")
-
 def start_training():
     global training_thread, X_val, X_train, Y_val, Y_train, model, vectorizer
     
@@ -95,6 +68,7 @@ def start_training():
             verbose=1
         )
 
+
     def monitor_completion():
         def is_completed():
             if training_thread.is_alive():
@@ -107,11 +81,44 @@ def start_training():
                 print(confusion_matrix(y_true, y_pred))
                 training_completed()
         
+
         is_completed()
+
 
     training_thread = threading.Thread(target=train, daemon=True)
     training_thread.start()
     monitor_completion()
+
+
+def training_completed():
+    model.save("../Trained_models/Models/sentiment_model_dropout_twice.keras")
+    vectorizer_model = tf.keras.Sequential([
+        vectorizer
+    ])
+
+    _ = vectorizer_model(tf.constant(["dummy text"]))
+
+    vectorizer_model.save("../Trained_models/Dictionaries/text_vectorizer.keras")
+    print("Vectorizer vocab size:", len(vectorizer.get_vocabulary()))
+
+    graph_btn.config(state="active")
+    start_btn.config(state="active")
+
+
+def assign_variables():
+    global words, max_length, epochs, X_val, Y_val
+    epochs = int(input_epoch.get())
+    max_length = int(input_review_length.get())
+    words = int(input_dictionary.get())
+
+
+def reset_labels():
+    label_epoch.config(text="Epoch: -", fg="black")
+    label_loss.config(text="Loss Before: - vs After: -", fg="black")
+    label_loss_difference.config(text="Difference: -", fg="black")
+    label_val_loss.config(text="Current Validation Loss: -", fg="black")
+    label_val_acc.config(text="Current Validation Accuracy: -", fg="black")
+
 
 metrics = tk.Frame(root)
 metrics.pack(pady=20, padx=40)

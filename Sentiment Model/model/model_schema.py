@@ -11,14 +11,63 @@ from tensorflow.keras.layers import Layer
 from tensorflow.keras.utils import register_keras_serializable
 import tensorflow as tf
 
+def get_ready(max_tokens, max_length):
+    nrows = 3200000
+    X_train, y_train, X_val, y_val, vectorizer = load_and_prepare_data(
+        nrows, max_tokens, max_length
+    )
+
+    vocab_size = len(vectorizer.get_vocabulary())
+
+    inputs = Input(shape=(max_length,))
+
+    x = Embedding(
+        input_dim=vocab_size,
+        output_dim=32,
+        mask_zero=False
+    )(inputs)
+    x = Bidirectional(
+            LSTM(
+                16, 
+                return_sequences=True, 
+                recurrent_dropout=0.2
+            ))(x)
+    x = AttentionLayer()(x)
+    x = Dense(
+            32, 
+            activation="relu", 
+            kernel_regularizer=l2(0.001)
+        )(x)
+    x = Dropout(0.5)(x)
+
+    outputs = Dense(2, activation="softmax")(x)
+    model = Model(inputs, outputs)
+
+    model.compile(
+        optimizer="adam",
+        loss="categorical_crossentropy",
+        metrics=[
+            "accuracy",
+            Precision(name="precision"),
+            Recall(name="recall")
+        ]
+    )
+
+    model.summary()
+
+    return X_train, y_train, X_val, y_val, model, vectorizer
+
+
 @register_keras_serializable()
 class AttentionLayer(Layer):
     def __init__(self, trainable=True, dtype=tf.float32, **kwargs):
         super(AttentionLayer, self).__init__(trainable=trainable, dtype=dtype, **kwargs)
         self.supports_masking = True
 
+
     def compute_mask(self, inputs, mask=None):
         return None
+
 
     def build(self, input_shape):
         self.W = self.add_weight(
@@ -41,48 +90,12 @@ class AttentionLayer(Layer):
         )
         super().build(input_shape)
 
+
     def call(self, inputs, mask = None):
         # inputs: (batch, time, features)
         score = tf.tanh(tf.tensordot(inputs, self.W, axes=1) + self.b)
         attention_weights = tf.nn.softmax(tf.tensordot(score, self.u, axes=1), axis=1)
         context_vector = tf.reduce_sum(inputs * attention_weights, axis=1)
+        
         return context_vector
 
-
-def get_ready(max_tokens, max_length):
-    nrows = 3200
-    X_train, y_train, X_val, y_val, vectorizer = load_and_prepare_data(
-        nrows, max_tokens, max_length
-    )
-
-    vocab_size = len(vectorizer.get_vocabulary())
-
-    inputs = Input(shape=(max_length,))
-
-    x = Embedding(
-        input_dim=vocab_size,
-        output_dim=32,
-        mask_zero=False
-    )(inputs)
-
-    x = Bidirectional(LSTM(16, return_sequences=True, recurrent_dropout=0.2))(x)
-    x = AttentionLayer()(x)
-    x = Dense(32, activation="relu", kernel_regularizer=l2(0.001))(x)
-    x = Dropout(0.5)(x)
-
-    outputs = Dense(2, activation="softmax")(x)
-    model = Model(inputs, outputs)
-
-    model.compile(
-        optimizer="adam",
-        loss="categorical_crossentropy",
-        metrics=[
-            "accuracy",
-            Precision(name="precision"),
-            Recall(name="recall")
-        ]
-    )
-
-    model.summary()
-
-    return X_train, y_train, X_val, y_val, model, vectorizer

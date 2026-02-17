@@ -19,19 +19,22 @@ class EpochLogger(Callback):
         self.loss_before = None
         self.epoch_count = 0
     
+
     def on_epoch_begin(self, epoch, logs=None):
         self.epoch_count = epoch + 1
         self.root.after(0, lambda: self.label_epoch.config(
             text=f"Working on Epoch {epoch + 1}..."))
         
+
     def on_train_end(self, logs=None):
         self.root.after(0, lambda: self.label_epoch.config(
             text=f"Finished all {self.epoch_count} Epochs."))
         
+
     def on_epoch_end(self, epoch, logs=None):
         current_loss = logs.get("val_loss")
         
-        def progress():
+        def progress(): 
             if epoch > 0:
                 if self.loss is not None: 
                     if current_loss < self.loss:
@@ -41,6 +44,7 @@ class EpochLogger(Callback):
                     
             return "blue", "No difference"
         
+
         color, difference = progress()
         last_loss = self.loss
         self.loss = current_loss
@@ -60,4 +64,5 @@ class EpochLogger(Callback):
             text=f"Current Validation Loss: {val_loss:.4f}"))
         self.root.after(0, lambda: self.label_val_acc.config(
             text=f"Current Validation Accuracy: {val_accuracy:.4f}"))
+      
       
