@@ -1,9 +1,9 @@
 Trained_models/Dictionaries/*
 Trained_models/Models/*
 Data/*
-*.csv
 Wykresy_uczenia.py
 Training_script/__pycache__
 Training_script/model/__pycache__
 Training_script/plots/__pycache__
 */__pycache__
+*/env
