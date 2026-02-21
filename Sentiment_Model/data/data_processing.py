@@ -52,7 +52,15 @@ def load_and_prepare_data(nrows, max_tokens, max_length):
         output_mode="int",
         output_sequence_length=max_length
     )
-
+    print(f"Liczba wierszy w tabeli: {len(df)}")
+    print(f"Liczba pustych wartości (NaN) w kolumnie 'clean': {df['clean'].isna().sum()}")
+    
+    # Usuwamy puste wartości przed podaniem do wektoryzatora (Zabezpieczenie)
+    df = df.dropna(subset=['clean'])
+    df = df[df['clean'].astype(str).str.strip() != ''] 
+    
+    print(f"Liczba wierszy po usunięciu pustych tekstów: {len(df)}")
+    # --------------------------
     vectorizer.adapt(df["clean"].values)
     X_train = vectorizer(df["clean"].values)
 
