@@ -12,8 +12,7 @@ from tensorflow.keras.utils import register_keras_serializable
 import tensorflow as tf
 
 
-def get_ready(max_tokens, max_length):
-    nrows = 20000
+def get_ready(neurons, dense, embedding, nrows, max_length, max_tokens, dropout):
     X_train, y_train, X_val, y_val, vectorizer = load_and_prepare_data(
         nrows, max_tokens, max_length
     )
@@ -24,22 +23,22 @@ def get_ready(max_tokens, max_length):
 
     x = Embedding(
         input_dim=vocab_size,
-        output_dim=32,
+        output_dim=embedding,
         mask_zero=False
     )(inputs)
     x = Bidirectional(
         LSTM(
-            16,
+            neurons,
             return_sequences=True,
             recurrent_dropout=0.2
         ))(x)
     x = AttentionLayer()(x)
     x = Dense(
-        32,
+        dense,
         activation="relu",
         kernel_regularizer=l2(0.001)
     )(x)
-    x = Dropout(0.5)(x)
+    x = Dropout(dropout)(x)
 
     outputs = Dense(2, activation="softmax")(x)
     model = Model(inputs, outputs)

@@ -14,9 +14,9 @@ class DashboardUI:
         
         btn_primary_hover = "#0b5ed7"
         btn_success_hover = "#157347"
-        btn_warning_hover = "#ffca2c
+        btn_warning_hover = "#ffca2c"
         
-        font_main = ("Segoe UI", 10)
+        font_main = ("Segoe UI", 10, "bold")
         font_title = ("Segoe UI", 11, "bold")
 
         self.root.configure(bg=bg_color)
@@ -36,6 +36,26 @@ class DashboardUI:
         self.input_epoch.pack(anchor="w", pady=(2, 12))
         self.input_epoch.insert(0, "6")
 
+        tk.Label(frame_vars, text="Number of neurons (LSTM):", bg=panel_bg, fg=text_color, font=font_main).pack(anchor="w")
+        self.input_neurons = tk.Entry(frame_vars, width=15, font=font_main, relief="solid", borderwidth=1)
+        self.input_neurons.pack(anchor="w", pady=(2, 12))
+        self.input_neurons.insert(0, "16")
+
+        tk.Label(frame_vars, text="Number of neurons (Dense):", bg=panel_bg, fg=text_color, font=font_main).pack(anchor="w")
+        self.input_dense = tk.Entry(frame_vars, width=15, font=font_main, relief="solid", borderwidth=1)
+        self.input_dense.pack(anchor="w", pady=(2, 12))
+        self.input_dense.insert(0, "32")
+
+        tk.Label(frame_vars, text="Embedding:", bg=panel_bg, fg=text_color, font=font_main).pack(anchor="w")
+        self.input_embedding = tk.Entry(frame_vars, width=15, font=font_main, relief="solid", borderwidth=1)
+        self.input_embedding.pack(anchor="w", pady=(2, 12))
+        self.input_embedding.insert(0, "32")
+
+        tk.Label(frame_vars, text="Number of reviews:", bg=panel_bg, fg=text_color, font=font_main).pack(anchor="w")
+        self.input_number_of_reviews = tk.Entry(frame_vars, width=15, font=font_main, relief="solid", borderwidth=1)
+        self.input_number_of_reviews.pack(anchor="w", pady=(2, 12))
+        self.input_number_of_reviews.insert(0, "3200000")
+
         tk.Label(frame_vars, text="Max length of reviews:", bg=panel_bg, fg=text_color, font=font_main).pack(anchor="w")
         self.input_review_length = tk.Entry(frame_vars, width=15, font=font_main, relief="solid", borderwidth=1)
         self.input_review_length.pack(anchor="w", pady=(2, 12))
@@ -45,6 +65,11 @@ class DashboardUI:
         self.input_dictionary = tk.Entry(frame_vars, width=15, font=font_main, relief="solid", borderwidth=1)
         self.input_dictionary.pack(anchor="w", pady=(2, 12))
         self.input_dictionary.insert(0, "20000")
+
+        tk.Label(frame_vars, text="Dropout rate:", bg=panel_bg, fg=text_color, font=font_main).pack(anchor="w")
+        self.input_dropout = tk.Entry(frame_vars, width=15, font=font_main, relief="solid", borderwidth=1)
+        self.input_dropout.pack(anchor="w", pady=(2, 12))
+        self.input_dropout.insert(0, "0.5")
 
         self.start_btn = tk.Button(frame_vars, text="Start Training", bg=btn_primary, fg="white", font=("Segoe UI", 10, "bold"), 
                                    relief="flat", cursor="hand2", padx=10, pady=2, command=cmd_start_training)

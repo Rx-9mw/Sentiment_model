@@ -65,21 +65,13 @@ class AttentionLayer(Layer):
 
 
 def clean_review(text):
-
     text = str(text).lower()
-
     text = re.sub(r"<.*?>", " ", text)
-
     text = re.sub(r"http\S+|www\S+", " ", text)
-
     text = contractions.fix(text)
-
     text = re.sub(r"[^\x00-\x7F]+", " ", text)
-
     text = re.sub(r"(.)\1{2,}", r"\1", text)
-
     text = re.sub(r"[^a-z\s]", " ", text)
-
     text = re.sub(r"\s+", " ", text).strip()
 
     return text
@@ -131,17 +123,17 @@ class InferenceManager:
             messagebox.showerror("ERROR", "No usable model found!")
             return
 
-        input_file = filedialog.askopenfilename(title="Wybierz plik z recenzjami", filetypes=[("CSV files", "*.csv"), ("Excel files", "*.xlsx")])
+        input_file = filedialog.askopenfilename(title="Choose a file...", filetypes=[("CSV files", "*.csv"), ("Excel files", "*.xlsx")])
         if not input_file:
             return
 
-        output_file = filedialog.asksaveasfilename(title="Zapisz wynik jako", defaultextension=".csv", filetypes=[("CSV files", "*.csv"), ("Excel files", "*.xlsx")])
+        output_file = filedialog.asksaveasfilename(title="Save the file as...", defaultextension=".csv", filetypes=[("CSV files", "*.csv"), ("Excel files", "*.xlsx")])
         if not output_file:
             return
 
         def process_file():
             try:
-                self.root.after(0, lambda: self.ui.label_batch_status.config(text="Przetwarzanie pliku...", fg="blue"))
+                self.root.after(0, lambda: self.ui.label_batch_status.config(text="Analysing...", fg="blue"))
                 
                 if input_file.endswith('.xlsx'):
                     df = pd.read_excel(input_file, header=None)
@@ -152,8 +144,8 @@ class InferenceManager:
                 
                 if df.shape[1] == 1:
                     text_col_idx = 0
-                    df.insert(0, 'Sentyment', '')
-                    target_col_idx = 'Sentyment'
+                    df.insert(0, 'Sentiment', '')
+                    target_col_idx = 'Sentiment'
                 else:
                     text_col_idx = 1
                     target_col_idx = 0
@@ -164,7 +156,7 @@ class InferenceManager:
                 preds = self.model.predict(vectorized)
                 class_idxs = np.argmax(preds, axis=1)
                 
-                labels = ["pozytywna" if idx == 1 else "negatywna" for idx in class_idxs]
+                labels = ["positive" if idx == 1 else "negative" for idx in class_idxs]
                 df[target_col_idx] = "[" + pd.Series(labels) + "]"
                 
                 if output_file.endswith('.xlsx'):
@@ -172,11 +164,11 @@ class InferenceManager:
                 else:
                     df.to_csv(output_file, index=False, header=False)
                     
-                self.root.after(0, lambda: self.ui.label_batch_status.config(text=f"Gotowe! Zapisano do: {output_file.split('/')[-1]}", fg="green"))
-                self.root.after(0, lambda: messagebox.showinfo("Sukces", "Przetwarzanie zakończone. Otwórz nowy plik!"))
+                self.root.after(0, lambda: self.ui.label_batch_status.config(text=f"Finished! File saved to: {output_file.split('/')[-1]}", fg="green"))
+                self.root.after(0, lambda: messagebox.showinfo("Success", "Sentiment analysis has succeeded"))
                 
             except Exception as e:
-                self.root.after(0, lambda: self.ui.label_batch_status.config(text="Wystąpił błąd!", fg="red"))
-                self.root.after(0, lambda err=e: messagebox.showerror("Błąd przetwarzania", f"Coś poszło nie tak:\n{str(err)}"))
+                self.root.after(0, lambda: self.ui.label_batch_status.config(text="ERROR", fg="red"))
+                self.root.after(0, lambda err=e: messagebox.showerror("Analysis ERROR", f"Something went wrong:\n{str(err)}"))
 
         threading.Thread(target=process_file, daemon=True).start()

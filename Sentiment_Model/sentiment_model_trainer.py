@@ -1,6 +1,10 @@
 import os
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 import tensorflow as tf
+import logging
+tf.get_logger().setLevel('ERROR')
+logging.getLogger('tensorflow').setLevel(logging.ERROR)
 from sklearn.metrics import classification_report, confusion_matrix
 import threading
 import tkinter as tk
@@ -39,7 +43,14 @@ def start_training():
     ui.text_report.config(state="disabled")
 
     assign_variables()
-    X_train, Y_train, X_val, Y_val, model, vectorizer = get_ready(words, max_length)
+    X_train, Y_train, X_val, Y_val, model, vectorizer = get_ready(
+        neurons, 
+        dense, 
+        embedding, 
+        review_num, 
+        max_length, 
+        words, 
+        dropout)
 
     reset_labels()
 
@@ -52,8 +63,16 @@ def start_training():
     def train():
         global history, model
         history = model.fit(
-            X_train, Y_train, epochs=epochs, batch_size=32, validation_data=(X_val, Y_val),
-            class_weight=class_weights, callbacks=[epoch_callback, early_stopping, lr_scheduler], verbose=1
+            X_train, Y_train, 
+            epochs=epochs, 
+            batch_size=256, 
+            validation_data=(X_val, Y_val),
+            class_weight=class_weights, 
+            callbacks=[
+                epoch_callback, 
+                early_stopping, 
+                lr_scheduler], 
+            verbose=1
         )
 
     def monitor_completion():
@@ -64,7 +83,7 @@ def start_training():
                 y_pred = model.predict(X_val).argmax(axis=1)
                 y_true = Y_val.argmax(axis=1)
                 
-                report_str = classification_report(y_true, y_pred)
+                report_str = classification_report(y_true, y_pred, zero_division=0)
                 cm_str = confusion_matrix(y_true, y_pred)
                 full_report = f"RAPORT:\n{report_str}\ERROR MATRIX:\n{cm_str}"
                 
@@ -96,10 +115,16 @@ def training_completed():
     ui.start_btn.config(state="active")
 
 def assign_variables():
-    global words, max_length, epochs
+    global epochs, neurons, dense, embedding, review_num, max_length, words, dropout
+
     epochs = int(ui.input_epoch.get())
+    neurons = int(ui.input_neurons.get())
+    dense = int(ui.input_dense.get())
+    embedding = int(ui.input_embedding.get())
+    review_num = int(ui.input_number_of_reviews.get())
     max_length = int(ui.input_review_length.get())
     words = int(ui.input_dictionary.get())
+    dropout = float(ui.input_dropout.get())
 
 def reset_labels():
     ui.label_epoch.config(text="Epoch: -", fg="black")
@@ -115,7 +140,7 @@ def show_graphs_wrapper():
 if __name__ == "__main__":
     root = tk.Tk()
     root.title("Sentiment Analysis Trainer and Tester.")
-    root.geometry("950x850") 
+    root.geometry("900x1050") 
 
     inference_manager = InferenceManager(root)
 
