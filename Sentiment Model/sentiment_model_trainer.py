@@ -1,9 +1,14 @@
+import os
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+import re
+import contractions
 import tensorflow as tf
 from sklearn.metrics import classification_report, confusion_matrix
 from Logger_live import EpochLogger
 from plots.plots import create_plot_window
 from model.model_schema import get_ready
 import threading
+import csv
 import tkinter as tk
 from tkinter import filedialog, messagebox
 from tensorflow.keras.callbacks import EarlyStopping
@@ -12,11 +17,8 @@ from tensorflow.keras.callbacks import ReduceLROnPlateau
 from sklearn.utils.class_weight import compute_class_weight
 from tensorflow.keras.layers import Layer
 import pandas as pd
-import os
-import re
-import contractions
 
-os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+
 tf.random.set_seed(42)
 np.random.seed(42)
 
@@ -112,60 +114,72 @@ def run_manual_test():
 
 def run_batch_test():
     if not ensure_model_loaded():
-        messagebox.showerror(
-            "Błąd", "Nie znaleziono modelu! Najpierw wytrenuj model.")
+        messagebox.showerror("Błąd", "Nie znaleziono modelu! Najpierw wytrenuj model.")
         return
 
-    input_file = filedialog.askopenfilename(title="Wybierz plik z recenzjami",
+    input_file = filedialog.askopenfilename(title="Wybierz plik z recenzjami", 
                                             filetypes=[("CSV files", "*.csv"), ("Excel files", "*.xlsx")])
     if not input_file:
         return
 
-    output_file = filedialog.asksaveasfilename(title="Zapisz wynik jako",
-                                               defaultextension=".csv",
+    output_file = filedialog.asksaveasfilename(title="Zapisz wynik jako", 
+                                               defaultextension=".csv", 
                                                filetypes=[("CSV files", "*.csv"), ("Excel files", "*.xlsx")])
     if not output_file:
         return
 
     def process_file():
         try:
-            root.after(0, lambda: label_batch_status.config(
-                text="Przetwarzanie pliku...", fg="blue"))
+            root.after(0, lambda: label_batch_status.config(text="Przetwarzanie pliku...", fg="blue"))
+            
+            # 1. Inteligentne wczytywanie (obsługuje przecinki i średniki)
+            # 1. Kuloodporne wczytywanie (omija błędy cudzysłowów Pandasa)
             if input_file.endswith('.xlsx'):
                 df = pd.read_excel(input_file, header=None)
             else:
-                df = pd.read_csv(input_file, header=None)
+                with open(input_file, 'r', encoding='utf-8') as f:
+                    data = list(csv.reader(f))
+                df = pd.DataFrame(data)
+            
+            # 2. Elastyczne dopasowanie kolumn (nie potrzebujesz już pustych nawiasów [])
+            if df.shape[1] == 1:
+                # Jeśli jest tylko jedna kolumna z tekstem, to ją analizujemy
+                text_col_idx = 0
+                df.insert(0, 'Sentyment', '') # Program sam dorobi pierwszą kolumnę na wyniki
+                target_col_idx = 'Sentyment'
+            else:
+                # Jeśli są dwie kolumny, tekst jest w drugiej
+                text_col_idx = 1
+                target_col_idx = 0
 
-            if df.shape[1] < 2:
-                raise ValueError(
-                    "Plik musi mieć co najmniej dwie kolumny (np. [] i 'tekst recenzji')")
-
-            text_col_idx = 1
-            clean_texts = df[text_col_idx].astype(
-                str).apply(clean_review).tolist()
-
+            clean_texts = df[text_col_idx].astype(str).apply(clean_review).tolist()
+            
+            # Podgląd w terminalu, żebyś miał dowód, że analizuje NOWE dane
+            print(f"\n--- BATCH TEST ---")
+            print(f"Analizuję {len(clean_texts)} recenzji z pliku: {input_file.split('/')[-1]}")
+            
+            # 3. Predykcja
             vectorized = vectorizer(tf.constant(clean_texts))
             preds = model.predict(vectorized)
             class_idxs = np.argmax(preds, axis=1)
-
-            labels = ["pozytywna" if idx ==
-                      1 else "negatywna" for idx in class_idxs]
-            df[0] = "[" + pd.Series(labels) + "]"
-
+            
+            # 4. Zapisywanie
+            labels = ["pozytywna" if idx == 1 else "negatywna" for idx in class_idxs]
+            df[target_col_idx] = "[" + pd.Series(labels) + "]"
+            
             if output_file.endswith('.xlsx'):
                 df.to_excel(output_file, index=False, header=False)
             else:
                 df.to_csv(output_file, index=False, header=False)
-
-            root.after(0, lambda: label_batch_status.config(
-                text=f"Gotowe! Zapisano do: {output_file.split('/')[-1]}", fg="green"))
-            messagebox.showinfo(
-                "Sukces", "Przetwarzanie zbiorcze zakończone pomyślnie!")
-
+                
+            # Sukces (używamy root.after, aby okienko pokazało się poprawnie z wątku)
+            root.after(0, lambda: label_batch_status.config(text=f"Gotowe! Zapisano do: {output_file.split('/')[-1]}", fg="green"))
+            root.after(0, lambda: messagebox.showinfo("Sukces", "Przetwarzanie zakończone. Otwórz nowy plik!"))
+            
         except Exception as e:
-            root.after(0, lambda: label_batch_status.config(
-                text="Wystąpił błąd!", fg="red"))
-            messagebox.showerror("Błąd", f"Wystąpił błąd: {str(e)}")
+            # Pokaże dokładną przyczynę błędu na ekranie
+            root.after(0, lambda: label_batch_status.config(text="Wystąpił błąd!", fg="red"))
+            root.after(0, lambda err=e: messagebox.showerror("Błąd przetwarzania", f"Coś poszło nie tak:\n{str(err)}"))
 
     threading.Thread(target=process_file, daemon=True).start()
 
