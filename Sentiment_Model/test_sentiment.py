@@ -3,7 +3,7 @@ import numpy as np
 import re
 import contractions
 from tensorflow.keras.layers import Layer
-
+ 
 
 def predict_sentiment(text):
     clean_text = clean_review(text)
