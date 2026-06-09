@@ -193,7 +193,7 @@ python -m pip install pandas matplotlib openpyxl tensorflow
 Start the GUI application:
 
 ```bash
-python gui.py
+python sentiment_model_trainer.py
 ```
 
 The application allows users to:
