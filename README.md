@@ -21,6 +21,8 @@ The project includes:
 * Desktop GUI built with Tkinter
 * Model persistence and loading
 
+<img width="939" height="771" alt="image" src="https://github.com/user-attachments/assets/bd15b73d-18bd-411d-9078-cc585da3bd4b" />
+
 ---
 
 ## Key Features
