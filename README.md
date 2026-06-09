@@ -1,82 +1,109 @@
 # Sentiment Analysis with BiLSTM and Attention Mechanism
 
+![Python](https://img.shields.io/badge/Python-3.9-blue)
+![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-orange)
+![Keras](https://img.shields.io/badge/Keras-Deep%20Learning-red)
+![Status](https://img.shields.io/badge/Status-Completed-success)
+![License](https://img.shields.io/badge/License-Educational-green)
+
 ## Overview
 
-This project implements a sentiment analysis system for product reviews using a Bidirectional Long Short-Term Memory (BiLSTM) neural network enhanced with a custom Attention mechanism. The solution was developed as part of an engineering thesis focused on natural language processing (NLP) and deep learning techniques.
+This project implements a deep learning-based sentiment analysis system for product reviews using a Bidirectional Long Short-Term Memory (BiLSTM) network enhanced with a custom Attention mechanism.
 
-The application allows users to train, evaluate, and monitor sentiment classification models through a graphical desktop interface built with Tkinter.
+The system was developed as part of an Engineering Thesis and focuses on binary sentiment classification (Positive / Negative) of product reviews from the Amazon Reviews Dataset.
 
-## Features
+The project includes:
 
-* Binary sentiment classification (Positive / Negative)
-* Bidirectional LSTM architecture
+* Data preprocessing pipeline
 * Custom Attention Layer implementation
-* Automated text preprocessing pipeline
-* Dataset balancing using class weights
-* Real-time training monitoring
-* Training management through graphical interface
-* Automatic learning rate reduction
-* Early stopping mechanism
-* Model serialization and persistence
-* Performance visualization and evaluation
+* BiLSTM sentiment classification model
+* Training and evaluation tools
+* Desktop GUI built with Tkinter
+* Model persistence and loading
 
 ---
 
-## Architecture
+## Key Features
 
-The neural network consists of the following layers:
+✅ Bidirectional LSTM architecture
+
+✅ Custom Attention Mechanism
+
+✅ Large-scale dataset support (Amazon Reviews)
+
+✅ Automatic dataset balancing
+
+✅ Early Stopping and Learning Rate Scheduling
+
+✅ L2 Regularization and Dropout
+
+✅ Graphical User Interface
+
+✅ Reproducible training process (Seed = 42)
+
+---
+
+## Model Architecture
 
 ```text
-Input Layer
-    ↓
+Input
+ │
+ ▼
 Embedding Layer
-    ↓
+ │
+ ▼
 Bidirectional LSTM
-    ↓
+ │
+ ▼
 Attention Layer
-    ↓
-Dense Layer (ReLU + L2 Regularization)
-    ↓
+ │
+ ▼
+Dense (ReLU + L2)
+ │
+ ▼
 Dropout
-    ↓
-Output Layer (Softmax)
+ │
+ ▼
+Softmax Output
 ```
 
-### Model Parameters
+### Architecture Details
 
-| Component           | Configuration            |
-| ------------------- | ------------------------ |
-| Embedding Dimension | 150                      |
-| LSTM Units          | 16                       |
-| Dense Units         | 32                       |
-| Recurrent Dropout   | 0.2                      |
-| Dropout             | 0.5                      |
-| Output Classes      | 2                        |
-| Activation Function | Softmax                  |
-| Optimizer           | Adam                     |
-| Loss Function       | Categorical Crossentropy |
+| Layer               | Configuration |
+| ------------------- | ------------- |
+| Input Length        | Configurable  |
+| Embedding Dimension | 150           |
+| LSTM Units          | 16            |
+| Recurrent Dropout   | 0.2           |
+| Dense Units         | 32            |
+| L2 Regularization   | 0.001         |
+| Dropout             | 0.5           |
+| Output Classes      | 2             |
+| Output Activation   | Softmax       |
 
 ---
 
-## Technologies Used
+## Technologies
 
-### Core Technologies
+### Machine Learning
 
-* Python 3.9
 * TensorFlow
 * Keras
 * NumPy
+* Scikit-learn
+
+### Data Processing
+
 * Pandas
-* Scikit-Learn
 * NLTK
+* Regex
+* Contractions
+
+### Application Layer
+
+* Python 3.9
 * Tkinter
-
-### Additional Components
-
-* Custom Attention Layer
-* Thread-based training execution
-* Dataset preprocessing pipeline
-* Visualization utilities
+* Threading
 
 ---
 
@@ -84,80 +111,84 @@ Output Layer (Softmax)
 
 The model was trained using a subset of the Amazon Reviews Dataset.
 
-Dataset characteristics:
+### Dataset Characteristics
 
 * Product reviews in English
-* Approximately 3.2 million records used for training
+* Over 3.2 million reviews used for training
 * Binary sentiment labels
 * CSV format
 
-The preprocessing pipeline includes:
+### Preprocessing Pipeline
 
-* Lowercase normalization
-* HTML removal
-* URL removal
-* Contraction expansion
-* Non-ASCII character filtering
-* Stopword removal
-* Tokenization
-* Vectorization
+1. Lowercase conversion
+2. HTML tag removal
+3. URL removal
+4. Contraction expansion
+5. Non-ASCII character filtering
+6. Punctuation removal
+7. Stopword removal
+8. Tokenization
+9. Vectorization
 
 ---
 
 ## Training Strategy
 
-The project utilizes several techniques to improve model generalization:
-
 ### Regularization
 
-* L2 Weight Regularization
-* Dropout (0.5)
-* Recurrent Dropout (0.2)
+```python
+Dropout = 0.5
+Recurrent Dropout = 0.2
+L2 = 0.001
+```
 
 ### Optimization
 
 * Adam Optimizer
 * ReduceLROnPlateau
-* Early Stopping
+* EarlyStopping
 * Class Weight Balancing
 
 ### Reproducibility
 
-A fixed random seed (`42`) is used for TensorFlow and NumPy to ensure reproducible experiments.
+```python
+seed = 42
+```
+
+Used for both NumPy and TensorFlow.
 
 ---
 
 ## Installation
 
-### Clone Repository
+Clone the repository:
 
 ```bash
-git clone https://github.com/your-username/sentiment-analysis-lstm.git
-
-cd sentiment-analysis-lstm
+git clone https://github.com/Rx-9mw/Sentiment_model.git
+cd Sentiment_model
 ```
 
-### Create Virtual Environment
+Create virtual environment:
 
 ```bash
 python -m venv venv
 ```
 
-### Activate Environment
+Activate environment:
 
-Windows:
+### Windows
 
 ```bash
 venv\Scripts\activate
 ```
 
-Linux / macOS:
+### Linux / macOS
 
 ```bash
 source venv/bin/activate
 ```
 
-### Install Dependencies
+Install dependencies:
 
 ```bash
 pip install -r requirements.txt
@@ -165,26 +196,82 @@ pip install -r requirements.txt
 
 ---
 
+## Running the Application
+
+Start the GUI application:
+
+```bash
+python gui.py
+```
+
+The application allows users to:
+
+* Configure model parameters
+* Train the model
+* Monitor training progress
+* Save trained models
+* Load existing models
+* Evaluate model performance
+
+---
+
+## Example Prediction
+
+### Input
+
+```text
+This product exceeded my expectations and works perfectly.
+```
+
+### Output
+
+```text
+Positive Sentiment
+```
+
+---
+
+### Input
+
+```text
+Completely useless. It broke after two days.
+```
+
+### Output
+
+```text
+Negative Sentiment
+```
+
+---
+
+## Evaluation Metrics
+
+The model supports evaluation using:
+
+* Accuracy
+* Precision
+* Recall
+* F1-Score
+* Confusion Matrix
+* Classification Report
+
+---
+
 ## Project Structure
 
 ```text
-project/
+Sentiment_model/
 │
 ├── data/
-│   ├── train.csv
-│   └── test.csv
 │
 ├── models/
-│   └── saved_models/
 │
 ├── src/
 │   ├── model_schema.py
-│   ├── data_processing.py
 │   ├── sentiment_model_trainer.py
-│   ├── attention_layer.py
+│   ├── data_processing.py
 │   └── gui.py
-│
-├── visualizations/
 │
 ├── requirements.txt
 │
@@ -193,47 +280,26 @@ project/
 
 ---
 
-## Running the Application
+## Engineering Thesis
 
-Launch the graphical interface:
+This repository was developed as part of an Engineering Thesis.
 
-```bash
-python gui.py
-```
+### Thesis Topic
 
-The GUI allows users to:
+**Sentiment Analysis of Product Reviews Using Bidirectional LSTM Networks with an Attention Mechanism**
 
-* Configure model parameters
-* Start and stop training
-* Monitor progress in real time
-* Save trained models
-* Generate performance charts
-
----
-
-## Evaluation Metrics
-
-The model is evaluated using:
-
-* Accuracy
-* Precision
-* Recall
-* Classification Report
-* Confusion Matrix
+The project investigates the effectiveness of recurrent neural networks in natural language processing tasks and evaluates the impact of attention-based architectures on sentiment classification performance.
 
 ---
 
 ## Future Improvements
 
-Potential enhancements include:
-
-* Transformer-based architectures (BERT, RoBERTa)
-* Multi-class sentiment classification
-* Aspect-Based Sentiment Analysis
-* GPU acceleration support
+* Transformer-based models (BERT, RoBERTa)
+* Explainable AI (XAI)
 * REST API deployment
-* Docker containerization
-* Web application interface
+* Docker support
+* GPU optimization
+* Web-based interface
 
 ---
 
@@ -243,12 +309,10 @@ Potential enhancements include:
 
 **Piotr Kurzak**
 
-Engineering Thesis
-Faculty of Computer Science
 WSB Merito University
 
 ---
 
 ## License
 
-This project is provided for educational and research purposes.
+This project is published for educational and research purposes.
