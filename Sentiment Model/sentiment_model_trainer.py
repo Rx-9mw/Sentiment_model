@@ -271,12 +271,12 @@ root = tk.Tk()
 root.title("Sentiment Analysis Dashboard")
 root.geometry("950x750")
 
-# --- PANEL 1: TRENING (Góra) ---
+# --- PANEL 1: TRAINING (Top) ---
 top_frame = tk.Frame(root)
 top_frame.pack(pady=10, padx=20, fill="x")
 
-# Parametry
-frame_vars = tk.LabelFrame(top_frame, text="Parametry Sieci", font=(
+# Parameters
+frame_vars = tk.LabelFrame(top_frame, text="Network Parameters", font=(
     "Helvetica", 11, "bold"), padx=15, pady=10)
 frame_vars.grid(row=0, column=0, padx=10, sticky="nwes")
 
@@ -299,8 +299,8 @@ start_btn = tk.Button(frame_vars, text="Start Training",
                       bg="lightblue", command=start_training)
 start_btn.pack(anchor="w", pady=5)
 
-# Metryki na żywo
-frame_train = tk.LabelFrame(top_frame, text="Metryki Treningowe", font=(
+# Live Metrics
+frame_train = tk.LabelFrame(top_frame, text="Training Metrics", font=(
     "Helvetica", 11, "bold"), padx=15, pady=10)
 frame_train.grid(row=0, column=1, padx=10, sticky="nwes")
 
@@ -316,8 +316,8 @@ label_loss_difference = tk.Label(
     frame_train, text="Difference: -", fg="black", font=("Helvetica", 10, "bold"))
 label_loss_difference.pack(anchor="w", pady=(0, 10))
 
-# Walidacja i Raport
-frame_val = tk.LabelFrame(top_frame, text="Metryki Walidacyjne i Raport", font=(
+# Validation and Report
+frame_val = tk.LabelFrame(top_frame, text="Validation Metrics and Report", font=(
     "Helvetica", 11, "bold"), padx=15, pady=10)
 frame_val.grid(row=0, column=2, padx=10, sticky="nwes")
 
@@ -334,49 +334,49 @@ graph_btn = tk.Button(frame_val, text="Show graphs", bg="lightblue",
 graph_btn.pack(anchor="w", pady=(0, 10))
 graph_btn.config(state="disabled")
 
-# Nowe pole tekstowe na raport końcowy z terminala
+# New text field for the final terminal report
 text_report = tk.Text(frame_val, height=13, width=45,
                       font=("Courier", 8), bg="#f4f4f4")
 text_report.pack(anchor="w")
-text_report.insert(tk.END, "Brak wyników. Rozpocznij trening.")
+text_report.insert(tk.END, "No results. Start training.")
 text_report.config(state="disabled")
 
 epoch_callback = EpochLogger(
     root, label_epoch, label_loss, label_val_loss, label_loss_difference, label_val_acc)
 
-# --- PANEL 2: TESTOWANIE RĘCZNE (Środek) ---
-middle_frame = tk.LabelFrame(root, text="Ręczne Testowanie Modelu (Pojedyncza opinia)", font=(
+# --- PANEL 2: MANUAL TESTING (Middle) ---
+middle_frame = tk.LabelFrame(root, text="Manual Model Testing (Single review)", font=(
     "Helvetica", 11, "bold"), padx=15, pady=10)
 middle_frame.pack(pady=10, padx=30, fill="x")
 
-tk.Label(middle_frame, text="Wpisz recenzję po angielsku:",
+tk.Label(middle_frame, text="Enter review in English:",
          font=("Helvetica", 10)).pack(anchor="w")
 input_test_text = tk.Text(middle_frame, height=3,
                           width=80, font=("Helvetica", 10))
 input_test_text.pack(pady=5)
 
-btn_test = tk.Button(middle_frame, text="Sprawdź Sentyment", bg="lightgreen", font=(
+btn_test = tk.Button(middle_frame, text="Check Sentiment", bg="lightgreen", font=(
     "Helvetica", 10, "bold"), command=run_manual_test)
 btn_test.pack(pady=5)
 
 label_test_result = tk.Label(
-    middle_frame, text="Wynik: -", font=("Helvetica", 12, "bold"))
+    middle_frame, text="Result: -", font=("Helvetica", 12, "bold"))
 label_test_result.pack(pady=5)
 
-# --- PANEL 3: BATCH PROCESSING (Dół) ---
-bottom_frame = tk.LabelFrame(root, text="Analiza Zbiorcza (Wgraj plik z recenzjami)", font=(
+# --- PANEL 3: BATCH PROCESSING (Bottom) ---
+bottom_frame = tk.LabelFrame(root, text="Batch Analysis (Upload reviews file)", font=(
     "Helvetica", 11, "bold"), padx=15, pady=10)
 bottom_frame.pack(pady=10, padx=30, fill="x")
 
-tk.Label(bottom_frame, text="Wgraj plik CSV/Excel. Program oczekuje, że w 2. kolumnie (Index 1) znajduje się tekst recenzji.",
+tk.Label(bottom_frame, text="Upload CSV/Excel file. The program expects the review text to be in the 2nd column (Index 1).",
          font=("Helvetica", 10)).pack(anchor="w")
 
-btn_batch = tk.Button(bottom_frame, text="Wybierz plik i analizuj", bg="gold", font=(
+btn_batch = tk.Button(bottom_frame, text="Open File", bg="gold", font=(
     "Helvetica", 10, "bold"), command=run_batch_test)
 btn_batch.pack(pady=10)
 
 label_batch_status = tk.Label(
-    bottom_frame, text="Status: Oczekiwanie na plik...", font=("Helvetica", 10))
+    bottom_frame, text="Status: Waiting for file...", font=("Helvetica", 10))
 label_batch_status.pack(pady=5)
 
 root.mainloop()
