@@ -168,30 +168,22 @@ git clone https://github.com/Rx-9mw/Sentiment_model.git
 cd Sentiment_model
 ```
 
-Create virtual environment:
+Create Conda virtual environment:
 
 ```bash
-python -m venv venv
+conda create -n ENV_NAME python=3.9
 ```
 
 Activate environment:
 
-### Windows
-
 ```bash
-venv\Scripts\activate
-```
-
-### Linux / macOS
-
-```bash
-source venv/bin/activate
+conda activate ENV_NAME
 ```
 
 Install dependencies:
 
 ```bash
-pip install -r requirements.txt
+python -m pip install pandas matplotlib openpyxl tensorflow
 ```
 
 ---
