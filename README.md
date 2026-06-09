@@ -25,21 +25,21 @@ The project includes:
 
 ## Key Features
 
-✅ Bidirectional LSTM architecture
+ Bidirectional LSTM architecture
 
-✅ Custom Attention Mechanism
+ Custom Attention Mechanism
 
-✅ Large-scale dataset support (Amazon Reviews)
+ Large-scale dataset support (Amazon Reviews)
 
-✅ Automatic dataset balancing
+ Automatic dataset balancing
 
-✅ Early Stopping and Learning Rate Scheduling
+ Early Stopping and Learning Rate Scheduling
 
-✅ L2 Regularization and Dropout
+ L2 Regularization and Dropout
 
-✅ Graphical User Interface
+ Graphical User Interface
 
-✅ Reproducible training process (Seed = 42)
+ Reproducible training process (Seed = 42)
 
 ---
 
@@ -218,7 +218,7 @@ This product exceeded my expectations and works perfectly.
 ### Output
 
 ```text
-Positive Sentiment
+Positive
 ```
 
 ---
@@ -232,7 +232,7 @@ Completely useless. It broke after two days.
 ### Output
 
 ```text
-Negative Sentiment
+Negative
 ```
 
 ---
@@ -250,31 +250,7 @@ The model supports evaluation using:
 
 ---
 
-## Project Structure
-
-```text
-Sentiment_model/
-│
-├── data/
-│
-├── models/
-│
-├── src/
-│   ├── model_schema.py
-│   ├── sentiment_model_trainer.py
-│   ├── data_processing.py
-│   └── gui.py
-│
-├── requirements.txt
-│
-└── README.md
-```
-
----
-
-## Engineering Thesis
-
-This repository was developed as part of an Engineering Thesis.
+## This repository was developed as part of an Engineering Thesis.
 
 ### Thesis Topic
 
@@ -302,9 +278,3 @@ The project investigates the effectiveness of recurrent neural networks in natur
 **Piotr Kurzak**
 
 WSB Merito University
-
----
-
-## License
-
-This project is published for educational and research purposes.
